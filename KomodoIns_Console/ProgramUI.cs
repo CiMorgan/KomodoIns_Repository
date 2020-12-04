@@ -347,6 +347,7 @@ namespace KomodoIns_Console
             foreach (DevTeam devTeam in listOfDevTeams)
             {
                 Console.WriteLine($"Team Name: {devTeam.TeamName}");
+                Console.WriteLine($"Team Number: {devTeam.TeamNumber}\n");
             }
         }
         //Create team
@@ -396,7 +397,7 @@ namespace KomodoIns_Console
                 {
                     Console.WriteLine(memberList[i]);
                 }
-                Console.WriteLine($"Would you like to another developer to Team {newName}?\n" +
+                Console.WriteLine($"\n\nWould you like to another developer to Team {newName}?\n" +
                   $"1. Yes\n" +
                   $"2. No");
                 addDev = Console.ReadLine();
