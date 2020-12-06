@@ -61,12 +61,23 @@ namespace KomodoIns_Repository
                 return false;
             }
         }
-        //Helper method
+        //Helper methods to search developers by name or ID number
         public Developer GetDeveloperByName(string name)
         {
             foreach(Developer developer in _listOfDevelopers)
             {
                 if(developer.Name == name)
+                {
+                    return developer;
+                }
+            }
+            return null;
+        }
+        public Developer GetDeveloperByID(int number)
+        {
+            foreach (Developer developer in _listOfDevelopers)
+            {
+                if (developer.IDnumber == number)
                 {
                     return developer;
                 }

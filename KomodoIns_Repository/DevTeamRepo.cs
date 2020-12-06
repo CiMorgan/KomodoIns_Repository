@@ -14,13 +14,11 @@ namespace KomodoIns_Repository
         {
             _listOfDevTeams.Add(devTeam);
         }
-
         //Read
         public List<DevTeam> GetDevTeamList()
         {
             return _listOfDevTeams;
         }
-
         //Update
         public bool UpdateExistingDevTeam(string originalName, DevTeam newDevTeam)
         {
@@ -39,8 +37,7 @@ namespace KomodoIns_Repository
                 return false;
             }
         }
-
-        //Delete
+        //Delete - returns false
         public bool RemoveDevTeamFromList(string name)
         {
             DevTeam devTeam = GetDevTeamByName(name);
@@ -60,13 +57,23 @@ namespace KomodoIns_Repository
                 return false;
             }
         }
-
-        //Helper method
+        //Helper method - get DevTeam by name
         public DevTeam GetDevTeamByName(string name)
         {
             foreach (DevTeam devTeam in _listOfDevTeams)
             {
                 if (devTeam.TeamName == name)
+                {
+                    return devTeam;
+                }
+            }
+            return null;
+        }
+        public DevTeam GetDevTeamByID(int number)
+        {
+            foreach (DevTeam devTeam in _listOfDevTeams)
+            {
+                if (devTeam.TeamNumber == number)
                 {
                     return devTeam;
                 }

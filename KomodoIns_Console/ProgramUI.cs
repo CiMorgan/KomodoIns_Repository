@@ -92,76 +92,64 @@ namespace KomodoIns_Console
                         Console.WriteLine("Please enter a valid number");
                         break;
                 }
-                Console.WriteLine("Please press any key to continue...");
+                Console.WriteLine("\nPlease press any key to continue...");
                 Console.ReadKey();
                 Console.Clear();
             }
         }
-        //Display all developers
+        //1. Display all developers
         private void DisplayAllDevelopers()
         {
-            Console.Clear();
             List<Developer> listOfDevelopers = _developerRepo.GetDeveloperList();
-
+            Console.WriteLine("\n");
             foreach (Developer developer in listOfDevelopers)
             {
-                Console.WriteLine($"Name: {developer.Name}\n" +
-                    $"ID number: {developer.IDnumber}\n");
+                Console.WriteLine($"ID number: {developer.IDnumber}    Name: {developer.Name}\n");
             }
         }
-        //Add new developer
+        //2. Add new developer
         private void AddNewDeveloper()
         {
             Developer newDeveloper = new Developer();
             List<Developer> listOfDevelopers = _developerRepo.GetDeveloperList();
             Console.Clear();
-            //name
+            //Ask for new developer's name
             Console.WriteLine("Enter the developer's name:");
             newDeveloper.Name = Console.ReadLine();
-            //ID number
+            //Ask if new developer already has an ID number
             Console.WriteLine("Does the developer have an ID number?\n" +
                 "1. Yes: the developer has an ID number\n" +
                 "2. No: the developer needs an ID number\n" +
                 "Enter 1 or 2");
             string IDnum = Console.ReadLine();
-
             bool NotValidID = true;
-            int tempID = 1;
+            int tempID = 1;      //initial tempID
+            if (IDnum == "1")  //user will input new ID number
+                {
+                Console.WriteLine("Enter the developer's six-digit ID number:");
+                tempID = int.Parse(Console.ReadLine());
+                }
+            else  //program will randomly generate a new ID number
+                {
+                tempID = RandomNumber(100001, 999999);
+                }
             while (NotValidID)
             {
-                if (tempID == 1)
-                {
-                    if (IDnum == "1")
-                    {
-                        Console.WriteLine("Enter the developer's IDnumber:");
-                        tempID = int.Parse(Console.ReadLine());
-                    }
-                    else
-                    {
-                        Random rnd = new Random();
-                        tempID = rnd.Next(100001, 999999);
-                    }
-                }
                 foreach (Developer developer in listOfDevelopers)
                 {
-                    if (tempID == developer.IDnumber)
+                    if (tempID == developer.IDnumber) //determine whether ID number is unique and if not, produce unique ID
                     {
                         Console.WriteLine("That ID number is already in use.\n" +
-                                          "A new ID number will be assigned.");
-                        tempID = 1;
-                        IDnum = "2";
-                        NotValidID = true;
-                    }
-                    else
-                    {
-                        newDeveloper.IDnumber = tempID;
-                        NotValidID = false;
+                                          "A new ID number will be assigned.\n");
+                        tempID = RandomNumber(100001, 999999);
                     }
                 }
+                newDeveloper.IDnumber = tempID;
+                NotValidID = false;
             }
-            Console.WriteLine($"{newDeveloper.Name}'s ID number is {newDeveloper.IDnumber}.");
+            Console.WriteLine($"\n{newDeveloper.Name}'s ID number is {newDeveloper.IDnumber}.\n");
             //Pluralsight
-            Console.WriteLine("Does the developer have a Pluralsight license?\n" +
+            Console.WriteLine("\nDoes the developer have a Pluralsight license?\n" +
                 "1. Yes: the developer has a Pluralsight license\n" +
                 "2. No: the developer does NOT have a Pluralsight license\n" +
                 "Enter 1 or 2");
@@ -177,48 +165,46 @@ namespace KomodoIns_Console
             }
 
             _developerRepo.AddDeveloperToList(newDeveloper);
-            Console.WriteLine($"Name: {newDeveloper.Name}\n" +
-                              $"ID number: {newDeveloper.IDnumber}\n" +
-                              $"Pluralsight: {newDeveloper.AccessToPluralsight}");
+            Console.WriteLine($"The following developer has been added:\n" +
+                              $"    Name: {newDeveloper.Name}\n" +
+                              $"    ID number: {newDeveloper.IDnumber}\n" +
+                              $"    Pluralsight: {newDeveloper.AccessToPluralsight}");
         }
-        //Remove developer
+        //3. Remove developer
         private void RemoveDeveloper()
         {
             Console.Clear();
             DisplayAllDevelopers();
-            Console.WriteLine("Enter the developer's name to be deleted:");
-            string deleteDeveloper = Console.ReadLine();
-            Console.WriteLine($"Confirm that {deleteDeveloper} should be deleted?\n" +
-                $"1. Delete user\n" +
-                $"2. Do not delete user");
-            string delInput = Console.ReadLine();
-            bool wasDeleted = false;
-            bool delete = false;
-            if (delInput == "1")
+            Console.WriteLine("Enter the developer's ID number to be deleted:");
+            int deleteDeveloper = int.Parse(Console.ReadLine());
+            string delName = FindDeveloperByNumber(deleteDeveloper);
+            if (delName != null)
             {
-                List<Developer> listOfDevelopers = _developerRepo.GetDeveloperList();
-                foreach (Developer developer in listOfDevelopers)
+                Console.WriteLine($"Confirm that {delName} should be deleted?\n" +
+                                  $"1. Delete user\n" +
+                                  $"2. Do not delete user");
+                string delInput = Console.ReadLine();
+                bool wasDeleted = false;
+                if (delInput == "1")
                 {
-                    if (developer.Name == deleteDeveloper)
-                    {
-                        delete = true;
-                    }
+                    wasDeleted = _developerRepo.RemoveDeveloperFromList(delName);
                 }
-                if (delete)
+                if (wasDeleted)
                 {
-                    wasDeleted = _developerRepo.RemoveDeveloperFromList(deleteDeveloper);
-                }
-                if (wasDeleted)    
-                {
-                    Console.WriteLine($"Developer {deleteDeveloper} was deleted.");
+                    Console.WriteLine($"Developer {delName} was deleted.");
                 }
                 else
                 {
-                    Console.WriteLine($"Developer {deleteDeveloper} was not deleted.");
+                    Console.WriteLine($"Developer {delName} was not deleted.");
                 }
             }
+            else
+            {
+                Console.WriteLine("That is not a valid ID number");
+            }
+
         }
-        //Display all developers with pluralsight
+        //4. Display all developers with Pluralsight
         private void DevelopersWithPluralsight()
         {
             Console.Clear();
@@ -234,7 +220,7 @@ namespace KomodoIns_Console
             }
 
         }
-        //Display all developers without pluralsight
+        //5. Display all developers without Pluralsight
         private void DevelopersNoPluralsight()
         {
             Console.Clear();
@@ -256,105 +242,164 @@ namespace KomodoIns_Console
             List<DevTeam> listOfDevTeams = _devTeamRepo.GetDevTeamList();
             List<Developer> listOfDevelopers = _developerRepo.GetDeveloperList();
             TeamDisplay();
-            Console.WriteLine("To what team should the developer be added?");
-            string addTeamInput = Console.ReadLine();
-            DisplayAllDevelopers();
-            Console.WriteLine($"Enter ID number of developer that will be added to {addTeamInput}?");
-            int memberToAdd = int.Parse(Console.ReadLine());
+            Console.WriteLine("Add developers to which team? Please enter the team's ID number.");
+            int addTeamInput = int.Parse(Console.ReadLine());
+            string nameOfTeam;
             bool added = false;
-            while (!added)
+            Console.Clear();
+            foreach (DevTeam devteam in listOfDevTeams)
             {
-                foreach (DevTeam devteam in listOfDevTeams)
+                if (devteam.TeamNumber == addTeamInput)
                 {
-                    if (devteam.TeamName == addTeamInput)
+                    Console.WriteLine($"\n{devteam.TeamName} contains the following members:\n");
+                    nameOfTeam = devteam.TeamName;
+                    for (int i = 0; i < devteam.Members.Count; i++)
                     {
-                        foreach (Developer developer in listOfDevelopers)
-                            if (developer.IDnumber == memberToAdd)
-                            {
-                                devteam.Members.Add(developer.Name);
-                                Console.WriteLine($"{developer.Name} has been added to {addTeamInput}.");
-                                added = true;
-                            }
+                        Console.WriteLine(devteam.Members[i]);
                     }
+                    List<string> memberListName = new List<string>();
+                    DisplayAllDevelopers();
+                    while (!added)
+                    {
+                        Console.WriteLine("\nEnter the ID number of the developers you would like to add.\n" +
+                                          "Press return / enter between each developer's ID number\n" +
+                                          "Enter 'Done' when complete\n");
+                        string addDevNum = Console.ReadLine();
+                        while (addDevNum != "Done")
+                        {
+                            int addDevID = int.Parse(addDevNum);
+                            Developer newDev = _developerRepo.GetDeveloperByID(addDevID);
+                            memberListName.Add(newDev.Name);
+                            addDevNum = Console.ReadLine();
+                        }
+                        added = true;
+                    }
+                    Console.WriteLine($"\nThe following developers were added to {devteam.TeamName}:\n");
+                    for (int i = 0; i < memberListName.Count; i++)
+                    {
+                        Console.WriteLine(memberListName[i]);
+                        devteam.Members.Add(memberListName[i]);
+                    }
+                    List<string> newList = devteam.Members;
+                    DevTeam modDevTeam = new DevTeam(nameOfTeam, addTeamInput, newList);
+                    added = _devTeamRepo.UpdateExistingDevTeam(nameOfTeam, modDevTeam);
                 }
             }
-            
+            if (added)
+            {
+                Console.WriteLine("\nDevelopers have been successfully added to the team.");
+            }
+            else
+            {
+                Console.WriteLine("\nDevelopers were not added to the team.");
+            }
         }
-        //Remove developer from team
+        //#7 Remove developer from team
         private void TeamRemoveDeveloper()
         {
             Console.Clear();
             List<DevTeam> listOfDevTeams = _devTeamRepo.GetDevTeamList();
             TeamDisplay();
-            Console.WriteLine("To what team should the developer be removed?");
-            string removeTeamInput = Console.ReadLine();
-            TeamDisplayMembers();
-            Console.WriteLine($"Which developer should be removed from {removeTeamInput}?");
-            string removeTeamMember = Console.ReadLine();
-            bool delete = false;
-
-            foreach (DevTeam devteam in listOfDevTeams)
+            Console.WriteLine("Remove developers from which team? Please enter the team's ID number.");
+            string strTeamNum = Console.ReadLine();
+            int TeamNum = int.Parse(strTeamNum);
+            List<string> removeList = new List<string>();
+            bool removed = false;
+            foreach (DevTeam devTeam in listOfDevTeams)
             {
-                if (devteam.TeamName == removeTeamInput)
+                if (devTeam.TeamNumber == TeamNum)
                 {
-                    for (int i = 0; i < devteam.Members.Count; i++)
+                    Console.WriteLine($"\n{devTeam.TeamName} contains the following members:\n");
+                    if (devTeam.Members.Count == 0)
                     {
-                        if (devteam.Members[i] == removeTeamMember)
+                        Console.WriteLine("This team has no members.");
+                        removed = false;
+                    }
+                    else
+                    {
+                        for (int i = 0; i < devTeam.Members.Count; i++)
                         {
-                            devteam.Members.Remove(removeTeamMember);
-                            delete = _devTeamRepo.UpdateExistingDevTeam(removeTeamInput, devteam);
+                            Developer remdev = _developerRepo.GetDeveloperByName(devTeam.Members[i]);
+                            string name = remdev.Name;
+                            int num = remdev.IDnumber;
+                            Console.WriteLine($"{num}   {name}\n");
                         }
+                        while (!removed)
+                        {
+                            Console.WriteLine("Which developer(s) would you like to delete?\n" +
+                                              "Press return / enter between each developer's ID number\n" +
+                                              "\nEnter 'Done' when complete\n");
+                            string delDevNum = Console.ReadLine();
+                            while (delDevNum != "Done")
+                            {
+                                int delDevID = int.Parse(delDevNum);
+                                Developer removeDev = _developerRepo.GetDeveloperByID(delDevID);
+                                removeList.Add(removeDev.Name);
+                                delDevNum = Console.ReadLine();
+                            }
+                            removed = true;
+                            }
+                        Console.WriteLine($"\nThe following developers were removed from {devTeam.TeamName}:\n");
+                        List<string> removeMembers = new List<string>();
+                        for (int j = 0; j < removeList.Count; j++)
+                        {
+                            Console.WriteLine(removeList[j]);
+                            devTeam.Members.Remove(removeList[j]);
+                        }
+                        List<string> upList = devTeam.Members;
+                        DevTeam modDevTeam = new DevTeam(devTeam.TeamName, devTeam.TeamNumber, upList);
+                        removed = _devTeamRepo.UpdateExistingDevTeam(devTeam.TeamName, modDevTeam);
+
                     }
                 }
             }
-            if (delete)
+            if (removed)
             {
-                Console.WriteLine($"Developer {removeTeamMember} was deleted from {removeTeamInput}.");
+                Console.WriteLine("\nDevelopers have been successfully removed the team.");
             }
             else
             {
-                Console.WriteLine($"Developer {removeTeamMember} was not deleted from {removeTeamInput}.");
+                Console.WriteLine("\nDevelopers were not removed the team.");
             }
         }
-        //Display team members
+
+        //8. Display team members
         private void TeamDisplayMembers()
         {
-            Console.Clear();
             List<DevTeam> listOfDevTeams = _devTeamRepo.GetDevTeamList();
             TeamDisplay();
-            Console.WriteLine("Display the team members for which of the above team?");
+            Console.WriteLine("Enter the ID number for the team?");
             string displayTeamInput = Console.ReadLine();
-
             foreach (DevTeam devTeam in listOfDevTeams)
             {
-                if (devTeam.TeamName == displayTeamInput)
+                int teamID = int.Parse(displayTeamInput);
+                if (devTeam.TeamNumber == teamID)
                 {
+                    string Tname = devTeam.TeamName;
+                    Console.WriteLine($"\nTeam {Tname} contains the following members:\n");
                     for(int i = 0; i < devTeam.Members.Count; i++)
                     {
                         Console.WriteLine(devTeam.Members[i]);
-                    }
-                    
-                }
-                
+                    }    
+                }  
             }
         }
-        //Display teams
+        //9. Display teams
         private void TeamDisplay()
         {
             Console.Clear();
             List<DevTeam> listOfDevTeams = _devTeamRepo.GetDevTeamList();
-
             foreach (DevTeam devTeam in listOfDevTeams)
             {
-                Console.WriteLine($"Team Name: {devTeam.TeamName}");
-                Console.WriteLine($"Team Number: {devTeam.TeamNumber}\n");
+                Console.WriteLine($"Team Number: {devTeam.TeamNumber}    Team Name: {devTeam.TeamName}\n");
             }
         }
-        //Create team
+        //10. Create team
         private void CreateTeam()
         {
             DevTeam newDevTeam = new DevTeam();
             List<DevTeam> listOfDevTeams = _devTeamRepo.GetDevTeamList();
+            List<Developer> listOfDevelopers = _developerRepo.GetDeveloperList();
             Console.Clear();
             //name
             Console.WriteLine("Enter the name of the new developer team:");
@@ -365,42 +410,44 @@ namespace KomodoIns_Console
             int newNumber = 000;
             while (NotValidID)
             {
-                Random rnd = new Random();
-                tempID = rnd.Next(101, 999);
+                tempID = RandomNumber(101, 999);
                 foreach (DevTeam devteam in listOfDevTeams)
                 {
-                    if (tempID != devteam.TeamNumber)
+                    if (tempID == devteam.TeamNumber)
                     {
-                        newNumber = tempID;
-                        NotValidID = false;
+                        tempID = RandomNumber(101, 999);
                     }
                 }
+                newNumber = tempID;
+                NotValidID = false;
             }
-
             string addDev = "1";
-            Console.WriteLine($"Would you like to add a developers to Team {newName}?\n" +
+            Console.WriteLine($"Would you like to add developers to {newName}?\n" +
                   $"1. Yes\n" +
                   $"2. No");
             addDev = Console.ReadLine();
-            List<string> memberList = new List<string>();
-            while (addDev == "1") 
+            List<int> memberListNum = new List<int>();
+            if (addDev == "1") 
             {
                 Console.Clear();
                 DisplayAllDevelopers();
-                Console.WriteLine($"Which developers would you like to add to Team {newName}?");
-                string addName = Console.ReadLine();
-                memberList.Add(addName);
-                Console.WriteLine($"Name: {newName}\n" +
-                  $"Number: {newNumber}\n" +
-                  $"Members:");
-                for (int i = 0; i < memberList.Count; i++)
+                Console.WriteLine("Enter the ID numbers of the developers you would like to add.\n" +
+                    "Press return / enter between each developer's ID number\n" +
+                    "Enter 'Done' when complete\n");
+                string addDevNum = Console.ReadLine();
+                while(addDevNum != "Done")
                 {
-                    Console.WriteLine(memberList[i]);
+                    int intID = int.Parse(addDevNum);
+                    memberListNum.Add(intID);
+                    addDevNum = Console.ReadLine(); 
                 }
-                Console.WriteLine($"\n\nWould you like to another developer to Team {newName}?\n" +
-                  $"1. Yes\n" +
-                  $"2. No");
-                addDev = Console.ReadLine();
+            }  
+            List<string> memberList = new List<string>();
+            foreach (int newID in memberListNum)
+            {
+                
+                Developer newMember = _developerRepo.GetDeveloperByID(newID);
+                memberList.Add(newMember.Name);
             }
             DevTeam newDev = new DevTeam(newName, newNumber, memberList);
             _devTeamRepo.AddDevTeamToList(newDev);
@@ -455,6 +502,24 @@ namespace KomodoIns_Console
             _devTeamRepo.AddDevTeamToList(devteam3);
             _devTeamRepo.AddDevTeamToList(devteam4);
 
+        }
+        public int RandomNumber(int min, int max)
+        {
+            Random rnd = new Random();
+            int tempNum = rnd.Next(min, max);
+            return tempNum;
+        }
+        public string FindDeveloperByNumber(int iDnumber)
+        {
+            List<Developer> listOfDevelopers = _developerRepo.GetDeveloperList();
+            foreach (Developer developer in listOfDevelopers)
+            {
+                if (developer.IDnumber == iDnumber)
+                {
+                    return developer.Name;
+                }
+            }
+            return null;
         }
     }
 }

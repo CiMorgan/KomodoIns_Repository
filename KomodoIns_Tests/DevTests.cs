@@ -19,5 +19,29 @@ namespace KomodoIns_Tests
 
             Assert.AreEqual(expected, actual);
         }
+        [TestMethod]
+        public void SetID_ShouldAddCorrectID()
+        {
+            Developer developer = new Developer();
+
+            developer.IDnumber = 987654;
+
+            int expected = 987654;
+            int actual = developer.IDnumber;
+
+            Assert.AreEqual(expected, actual);
+        }
+        [TestMethod]
+        public void SetAccess_ShouldAddCorrectAccess()
+        {
+            Developer developer = new Developer();
+
+            developer.AccessToPluralsight = true;
+
+            bool expected = true;
+            bool actual = developer.AccessToPluralsight;
+
+            Assert.AreEqual(expected, actual);
+        }
     }
 }
